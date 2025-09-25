@@ -13,6 +13,10 @@ class WebsocketClient:
         self.is_running=False
 
     def on_open(self,ws):
+        init_msg={"type":"sub","topic":"systemStatusChangedV2"}
+        init2_msg={"type":"init"}
+        ws.send(json.dumps(init_msg))
+        ws.send(json.dumps(init2_msg))
         for code in self.stock_codes:
             msg_matchedTrades={"type":"sub","topic":"leTableAddV2","variables":[code],"component":"matchedPriceHistoriesTable"} 
             msg_priceDepth={"type":"sub","topic":"stockRealtimeBySymbolsAndBoards","variables":{"symbols":[code],"boardIds":["MAIN"]},"component":"priceDepth"}
@@ -29,6 +33,7 @@ class WebsocketClient:
 
     def on_close(self, ws, close_status_code, close_msg):
         logger.warning("Websocket connection closed")
+
     def run_forever(self):
         self.is_running=True
         self.ws=websocket.WebSocketApp(
@@ -38,4 +43,8 @@ class WebsocketClient:
             on_close=self.on_close,
             on_error=self.on_error,
         )
-        self.ws.run_forever()
+        self.ws.run_forever(
+            ping_interval=20,
+            ping_timeout=10,
+            reconnect=0.1
+        )
