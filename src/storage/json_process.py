@@ -40,14 +40,14 @@ class JsonProcessor:
                 "KL": "",
                 "M/B": "",
                 "zone": [
-                    {"KL_mua": "", "Gia_mua": "", "Gia_ban": "", "KL_ban": ""},
-                    {"KL_mua": "", "Gia_mua": "", "Gia_ban": "", "KL_ban": ""},
-                    {"KL_mua": "", "Gia_mua": "", "Gia_ban": "", "KL_ban": ""}
+                    {"KL_mua 1": "", "Gia_mua 1": "", "Gia_ban 1": "", "KL_ban 1": ""},
+                    {"KL_mua 2": "", "Gia_mua 2": "", "Gia_ban 2": "", "KL_ban 2": ""},
+                    {"KL_mua 3": "", "Gia_mua 3": "", "Gia_ban 3": "", "KL_ban 3": ""}
                 ]
             }
 
         data[timestamp]["Khớp"] = trade_time
-        data[timestamp]["Giá"] = trade_data["price"]
+        data[timestamp]["Giá"] = trade_data["price"] / 1000.0
         data[timestamp]["KL"] = trade_data["volume"]
         data[timestamp]["M/B"] = trade_data["side"]
 
@@ -55,10 +55,36 @@ class JsonProcessor:
 
     def update_orderbook(self, stock_code: str, order_data: list[dict]):
         """
-        order_data = [
-            {"KL_mua": "100", "Gia_mua": "29.50", "Gia_ban": "29.55", "KL_ban": "200"},
-            ...
-        ]
+        order_data = {
+            "bids": [
+                {
+                    "price": 22600,
+                    "volume": 13900
+                },
+                {
+                    "price": 22550,
+                    "volume": 300
+                },
+                {
+                    "price": 22500,
+                    "volume": 107000
+                }
+            ],
+            "asks": [
+                {
+                    "price": 22700,
+                    "volume": 1000
+                },
+                {
+                    "price": 22750,
+                    "volume": 5000
+                },
+                {
+                    "price": 22850,
+                    "volume": 30000
+                }
+            ]
+        }
         """
         data = self._load_json(stock_code)
         timestamp = datetime.now().strftime("%H:%M:%S.%f")
@@ -72,5 +98,14 @@ class JsonProcessor:
                 "zone": []
             }
 
-        data[timestamp]["zone"] = order_data
+        new_zone=[]
+        for i in range(3):
+            new_zone.append({
+                f"KL_mua {i+1}": order_data['bids'][i]['volume'] ,
+                f"Gia_mua {i+1}": order_data['bids'][i]['price'] / 1000.0,
+                f"Gia_ban {i+1}": order_data['asks'][i]['price'] / 1000.0,
+                f"KL_ban {i+1}": order_data['asks'][i]['volume'],
+            })
+        data[timestamp]["zone"] = new_zone
+        
         self._save_json(stock_code, data)

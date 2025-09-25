@@ -18,9 +18,9 @@ class DataHandler:
 
             # Loại message: matched trade hay order book?
             if parts[1].startswith("L#"):
-                return self._parse_matched_trade(parts)
+                return self.parse_matched_trade(parts)
             elif parts[1].startswith("S#"):
-                return self._parse_order_book(parts)
+                return self.parse_order_book(parts)
             else:
                 logger.debug(f"Unknown message type: {raw_message}")
                 return {}
@@ -29,7 +29,7 @@ class DataHandler:
             logger.error(f"Parse error: {e} | Message: {raw_message}")
             return {}
 
-    def _parse_matched_trade(self, parts: list) -> dict:
+    def parse_matched_trade(self, parts: list) -> dict:
         """
         Parse matched trade message (L#).
         Ví dụ:
@@ -44,7 +44,7 @@ class DataHandler:
             "side": "B" if parts[7] =="bu" else "M",   # "bu" = buy, "se" = sell
         }
 
-    def _parse_order_book(self, parts: list) -> dict:
+    def parse_order_book(self, parts: list) -> dict:
         """
         Parse order book message (S#).
         Do message quá dài, tách riêng BID / ASK book.
