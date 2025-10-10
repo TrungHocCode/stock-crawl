@@ -41,7 +41,7 @@ class DataHandler:
             "price": int(parts[2]),
             "volume": int(parts[3]),
             "time": parts[5],
-            "side": "B" if parts[7] =="bu" else "M",   # "bu" = buy, "se" = sell
+            "side": "M" if parts[7] =="bu" else "B",   # "bu" = buy, "se" = sell
         }
 
     def parse_order_book(self, parts: list) -> dict:
